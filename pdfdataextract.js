@@ -30,6 +30,9 @@ const pdfDataExtract = async (file) => {
 		let i = 0;
 		let c = 0;
 		for (let line of lines) {
+			if (line.includes('Resumo Pedido')) {
+				break
+			}
 			if (line.includes('CA50') || line.includes('CA60')) {
 				if (c == 0) {
 					i++;

@@ -55,10 +55,10 @@ const pdfDataExtract = async (file) => {
 		return {};
 	}
 }
-/*
+
 (async () => {
-	const test = await pdfDataExtract('arquives_test_pdf/PDFs/resumo_de_aco/CSC.005-A ao D.pdf')
+	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/CSC.005-A ao D.pdf')
 	console.log(test)
-})()*/
+})()
 
 module.exports = pdfDataExtract;

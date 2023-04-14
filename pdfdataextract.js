@@ -27,19 +27,33 @@ const pdfDataExtract = async (file) => {
 		let gauges = {};
 		let data_text = data_1.text; // an array of text pages
 		let lines = data_text[0].split('\n');
+		console.log(lines)
 		let i = 0;
 		let c = 0;
+		let esp = false;
+		let requestCode = ''
+		let codePackingList
 		for (let line of lines) {
+			if (esp) {
+				esp = false
+				let temp = line.split(' ')
+				let temp_2 = temp[0].split('.')
+				requestCode += temp_2[0] + temp_2[1]
+			}
+			if (line.includes('Localizador')) {
+				esp = true 
+			}
 			if (line.includes('Resumo Pedido')) {
 				break
 			}
 			if (line.includes('CA50') || line.includes('CA60')) {
 				if (c == 0) {
 					i++;
-					gauges[alphabet[i - 1]] = [];
+					codePackingList = requestCode + alphabet[i - 1]
+					gauges[codePackingList] = [];
 				}
 				let temp = line.split(' ');
-				gauges[alphabet[i - 1]].push({
+				gauges[codePackingList].push({
 					"aço": temp[1],
 					"bitola": temp[0],
 					"peso": temp[2]
@@ -49,6 +63,7 @@ const pdfDataExtract = async (file) => {
 				c = 0;
 			}
 		}
+
 		return gauges;
 	} catch (err) {
 		console.log(`Ocorreu um erro durante o processo: ${err.message}`);

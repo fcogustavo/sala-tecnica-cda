@@ -6,7 +6,7 @@ const idSheetTest = '1hWAX934Wk2sE1xeja_Di4L5f2nsc5I-e7XfXTnnloyc'
 
 const exportData = async () => {
     try {
-        const doc = new GoogleSpreadsheet(idSheetCDA);
+        const doc = new GoogleSpreadsheet(idSheetTest);
     
         await doc.useServiceAccountAuth({
             client_email: credentials.client_email,
@@ -18,11 +18,11 @@ const exportData = async () => {
         console.log(doc.title);
 
         const sheet = doc.sheetsByIndex[0];
-
+        
         await sheet.loadHeaderRow()
 
         let listHeader = sheet.headerValues;
-
+        
         console.log(listHeader)
 
         return doc

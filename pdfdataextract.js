@@ -54,7 +54,7 @@ const pdfDataExtract = async (file) => {
 				}
 				let temp = line.split(' ');
 				gauges[codePackingList].push({
-					"aço": temp[1],
+					"aco": temp[1],
 					"bitola": temp[0],
 					"peso": temp[2]
 				});

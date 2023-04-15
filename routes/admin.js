@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const {eAdmin} = require('../helpers/eAdmin');
 const pdfDataExtract = require('../pdfdataextract');
-const exportData = require('../exportdatasheets')
+const exportDataSheets = require('../exportdatasheets');
+const functionsGauges = require('../functionsGauges');
 const multer = require('multer');
 const upload = multer({dest: './public/data/uploads'});
 
@@ -14,17 +15,29 @@ router.get('/register_gauges', eAdmin, (req, res) => {
     res.render('admin/register_gauges');
 });
 
-router.post('/register_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
-    let arquive = req.file
+router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
+    let arquive = req.file;
+    if (arquive) {  
+        (async () => {
+            let objDataPDF = await pdfDataExtract(arquive.path)
+            let objDataPDFKeys = Object.keys(objDataPDF);
+            let rowsDataPDF = await functionsGauges.rowsDataPDF(objDataPDF, objDataPDFKeys);
+            res.render('admin/register_gauges', {rowsDataPDF});
+        })();
+    };
+});
+
+router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
+    let arquive = req.file;
     if (arquive) {  
         (async () => {
             const objDataPDF = await pdfDataExtract(arquive.path)
             console.log(objDataPDF)
-            const dataSheets = exportData(objDataPDF, '', 'Gustavo')
-            console.log(dataSheets.title)
-        })()
-    }
-    res.redirect('/')
+            const dataSheets = exportDataSheets(objDataPDF, '', 'Gustavo')
+
+        })();
+    };
+    res.redirect('/');
 })
 
 module.exports = router;

@@ -1,11 +1,39 @@
 <div class="card mt-4">
-        <div class="card-body">
-            <h3>Cadastro de bitolas</h3>
-            <p>Insira abaixo o arquivo resumo de aço:</p>
-            <form action="/admin/register_gauges" enctype="multipart/form-data" method="post">
-                <input type="file" class="form-control-file" name="registerGauges">
-                <button type="submit">Enviar</button>
-            </form>
-            <hr>
-        </div>
+    <div class="card-body">
+        <h3>Cadastro de bitolas</h3>
+        <p>Insira abaixo o arquivo resumo de aço:</p>
+        <form action="/admin/get_gauges" enctype="multipart/form-data" method="post">
+            <input type="file" class="form-control-file" name="registerGauges">
+            <button type="submit">Enviar</button>
+        </form>
+        <hr>
+        <table class="table">
     </div>
+</div>
+{{#if rowsDataPDF}}
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">Romaneio</th>
+                    <th scope="col">Aço</th>
+                    <th scope="col">Bitola</th>
+                    <th scope="col">Peso</th>
+                    <th scope="col">Observação</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each rowsDataPDF}}
+                    <tr>
+                        <td>{{romaneio}}</td>
+                        <td>{{aco}}</td>
+                        <td>{{bitola}}</td>
+                        <td>{{peso}}</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+    <hr>
+
+{{/if}}

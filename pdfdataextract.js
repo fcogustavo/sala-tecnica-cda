@@ -24,14 +24,18 @@ const pdfDataExtract = async (file) => {
 			}
 		});
 		// Formata o objeto gauges a partir do data.
-		let gauges = {};
+		let gauges = [];
 		let data_text = data_1.text; // an array of text pages
 		let lines = data_text[0].split('\n');
 		let i = 0;
 		let c = 0;
+		let id = 0;
 		let esp = false;
 		let requestCode = ""
 		let codePackingList;
+		let listGauges = [];
+		let listSteel = [];
+		// Extraindo dados dos romaneios.
 		for (let line of lines) {
 			if (esp) {
 				esp = false;
@@ -49,21 +53,47 @@ const pdfDataExtract = async (file) => {
 				if (c == 0) {
 					i++;
 					codePackingList = requestCode + alphabet[i - 1]
-					gauges[codePackingList] = [];
 				};
+				id++;
 				let temp = line.split(' ');
-				gauges[codePackingList].push({
+				if (!listGauges.includes(temp[0])) {
+					listGauges.push(temp[0]);
+					listSteel.push(temp[1]);
+				};
+				gauges.push({
+					"id": id,
+					"romaneio": codePackingList,
 					"aco": temp[1],
 					"bitola": temp[0],
-					"peso": temp[2]
+					"peso": Math.round(Number(temp[2].replace(',', '.')))
 				});
 				c++;
 			} else {
 				c = 0;
 			};
 		};
+		// Extraindo dados do resumo dos romaneios
+		let totalWeight = 0;
+		let summary = [];
+		for (let c = 0; c < listGauges.length; c++) {
+			id++;
+			let weight = 0;
+			gauges.forEach(g => {
+				if (g.bitola == listGauges[c]) {
+					weight += g.peso;
+				}
+			});
+			totalWeight += weight;
+			summary.push({
+				"id": id,
+				"romaneio": "Resumo",
+				"aco": listSteel[c],
+				"bitola": listGauges[c],
+				"peso": weight			
+			});
+		};
 
-		return gauges;
+		return {gauges, summary, totalWeight};
 	} catch (err) {
 		console.log(`Ocorreu um erro durante o processo: ${err.message}`);
 		return {};

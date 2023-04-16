@@ -3,37 +3,68 @@
         <h3>Cadastro de bitolas</h3>
         <p>Insira abaixo o arquivo resumo de aço:</p>
         <form action="/admin/get_gauges" enctype="multipart/form-data" method="post">
-            <input type="file" class="form-control-file" name="registerGauges">
-            <button type="submit">Enviar</button>
+            <input type="file" class="form-control" name="registerGauges">
+            <br>
+            <button type="submit" class="btn btn-primary">Analisar</button>
         </form>
         <hr>
         <table class="table">
     </div>
 </div>
-{{#if rowsDataPDF}}
-
+{{#if objDataPDF}}
+    <form action="/admin/export_gauges" method="post">
         <table class="table">
-            <thead>
+            <thead class="table-primary">
                 <tr>
+                    <th scope="col">#</th>
                     <th scope="col">Romaneio</th>
                     <th scope="col">Aço</th>
                     <th scope="col">Bitola</th>
                     <th scope="col">Peso</th>
+                    <th scope="col">Planilhador</th>
                     <th scope="col">Observação</th>
                 </tr>
             </thead>
             <tbody>
-                {{#each rowsDataPDF}}
+                {{#each objDataPDF.gauges}}
                     <tr>
+                        <th scope="row">{{id}}</th>
                         <td>{{romaneio}}</td>
                         <td>{{aco}}</td>
                         <td>{{bitola}}</td>
                         <td>{{peso}}</td>
+                        <td>
+                            <select class="form-select">
+                                {{#each users}}
+                                    <option value="{{_id}}" {{select}}>{{name}}</option>
+                                {{/each}}
+                            </select>
+                        </td>
+                        <td><input type="text" name="obs-{{id}}" class="form-control" placeholder="Insira Observação (opcional)" aria-describedby="basic-addon1"></td>
                     </tr>
                 {{/each}}
+                    <tr>
+                        <td colspan="7" class="table-active" align="center"><strong>Resumo</strong></td>
+                    </tr>
+                {{#each objDataPDF.summary}}
+                    <tr>
+                        <th scope="row">{{id}}</th>
+                        <td>{{romaneio}}</td>
+                        <td>{{aco}}</td>
+                        <td>{{bitola}}</td>
+                        <td>{{peso}}</td>
+                        <td></td>
+                        <td><input type="text" name="obs" class="form-control" aria-describedby="basic-addon1" disabled></td>
+                    </tr>
+                {{/each}}
+                <tr>
+                    <td colspan="4" class="table-active" align="center"><strong>Peso Total - Kg</strong></td>
+                    <td colspan="1" class="table-active"><strong>{{objDataPDF.totalWeight}}</strong></td>
+                </tr>
             </tbody>
         </table>
-
-    <hr>
-
+        <hr>
+        <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
+        <a href="/admin/register_gauges"><button type="button" class="btn btn-secondary btn-lg">Cancelar</button></a>
+    </form>
 {{/if}}

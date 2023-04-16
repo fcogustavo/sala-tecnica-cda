@@ -1,3 +1,4 @@
+/*
 const rowsDataPDF =  async (obj, li) => {
     try {
         let listRows = [];
@@ -14,5 +15,4 @@ const rowsDataPDF =  async (obj, li) => {
         return {};
     };
 };
-
-module.exports = {rowsDataPDF};
+*/

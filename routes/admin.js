@@ -31,8 +31,9 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
                 };
             });
             let objDataPDF = await pdfDataExtract(arquive.path);
+            arquive = arquive.path
             console.log(users)
-            res.render('admin/register_gauges', {objDataPDF, users});
+            res.render('admin/register_gauges', {objDataPDF, users, arquive});
         })();
     } else {
         res.redirect('/admin/register_gauges');
@@ -40,19 +41,15 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
 });
 
 router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
-    console.log(req.body)
+    console.log(req.body.arquive)
     console.log(req.body.objDataPDF)
-    /*
-    let arquive = req.file;
-    if (arquive) {  
-        (async () => {
-            const objDataPDF = await pdfDataExtract(arquive.path)
-            console.log(objDataPDF)
-            const dataSheets = exportDataSheets(objDataPDF, '', 'Gustavo')
+     
+    (async () => {
+        const objDataPDF = await pdfDataExtract(req.body.arquive)
+        console.log(objDataPDF)
 
-        })();
-    };
-    res.redirect('/');*/
+    })();
+    res.redirect('/');
 })
 
 module.exports = router;

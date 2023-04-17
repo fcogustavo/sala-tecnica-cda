@@ -34,9 +34,9 @@
                         <td>{{bitola}}</td>
                         <td>{{peso}}</td>
                         <td>
-                            <select class="form-select">
-                                {{#each users}}
-                                    <option value="{{_id}}" {{select}}>{{name}}</option>
+                            <select class="form-select" name="name">
+                                {{#each ../users}}
+                                    <option value="{{../id}}" {{select}}>{{name}}</option>
                                 {{/each}}
                             </select>
                         </td>
@@ -63,6 +63,7 @@
                 </tr>
             </tbody>
         </table>
+        <input type="text" name="objDataPDF" value="{{objDataPDF}}" hidden>
         <hr>
         <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
         <a href="/admin/register_gauges"><button type="button" class="btn btn-secondary btn-lg">Cancelar</button></a>

@@ -41,6 +41,7 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
 
 router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
     console.log(req.body)
+    console.log(req.body.objDataPDF)
     /*
     let arquive = req.file;
     if (arquive) {  

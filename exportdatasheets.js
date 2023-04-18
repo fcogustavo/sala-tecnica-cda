@@ -4,7 +4,7 @@ const credentials = require('./config/credentials.json')
 const idSheetCDA = '11Kk2nFmJSqrfKD_uB5aiGbZ9hCA0K6Ss_sKRP_zDlVk'
 const idSheetTest = '1hWAX934Wk2sE1xeja_Di4L5f2nsc5I-e7XfXTnnloyc'
 
-const exportData = async (obj=undefined, obs="", nameId="") => {
+const exportData = async (obj=undefined) => {
     try {
         const doc = new GoogleSpreadsheet(idSheetTest);
     
@@ -19,24 +19,22 @@ const exportData = async (obj=undefined, obs="", nameId="") => {
 
         const sheet = doc.sheetsByIndex[0];
         
-        await sheet.loadHeaderRow();
+        //await sheet.loadHeaderRow();
 
-        let listHeader = sheet.headerValues
+        //let listHeader = sheet.headerValues
 
         if (obj && typeof obj == 'object' && !Array.isArray(obj)) {
-            for (let p in obj) {
-                for (let line of obj[p]) {
-                    let t = new Date(Date.now());
-                    await sheet.addRow({
-                        "Carimbo de data/hora": t.toLocaleString(),
-                        "Identifique-se:": nameId,
-                        "Lançar o romaneio:": p,
-                        "Informe a bitola:": line.bitola,
-                        "Peso total deste romaneio:": line.peso,
-                        "Informe neste campo alguma observação:": obs
-                    });
-                };
-            };
+            for (let line of obj.gauges) {
+                let t = new Date(Date.now());
+                await sheet.addRow({
+                    "Carimbo de data/hora": t.toLocaleString(),
+                    "Identifique-se:": line.planilhador,
+                    "Lançar o romaneio:": line.romaneio,
+                    "Informe a bitola:": line.bitola + "mm",
+                    "Peso total deste romaneio:": line.peso,
+                    "Informe neste campo alguma observação:": line.observacao
+                });
+            };  
         };
         
         return doc;

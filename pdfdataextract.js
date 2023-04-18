@@ -35,6 +35,9 @@ const pdfDataExtract = async (file) => {
 		let codePackingList;
 		let listGauges = [];
 		let listSteel = [];
+		if (lines[0] != "Carteira de Pedidos por Cliente/Obra") {
+			return "Documento não compatível!";
+		}
 		// Extraindo dados dos romaneios.
 		for (let line of lines) {
 			if (esp) {
@@ -96,7 +99,7 @@ const pdfDataExtract = async (file) => {
 		return {gauges, summary, totalWeight};
 	} catch (err) {
 		console.log(`Ocorreu um erro durante o processo: ${err.message}`);
-		return {};
+		return "Ocorreu um erro. Verifique o formato do arquivo.";
 	};
 };
 /*

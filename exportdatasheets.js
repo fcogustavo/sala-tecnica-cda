@@ -6,7 +6,7 @@ const idSheetTest = '1hWAX934Wk2sE1xeja_Di4L5f2nsc5I-e7XfXTnnloyc'
 
 const exportData = async (obj=undefined) => {
     try {
-        const doc = new GoogleSpreadsheet(idSheetTest);
+        const doc = new GoogleSpreadsheet(idSheetCDA);
     
         await doc.useServiceAccountAuth({
             client_email: credentials.client_email,
@@ -37,10 +37,10 @@ const exportData = async (obj=undefined) => {
             };  
         };
         
-        return doc;
+        return "Documento salvo com sucesso!";
     } catch (err) {
         console.log(`Ocorreu um erro durante o processo: ${err.message}`);
-        return {};
+        return "Houve um erro durante o processo! Tente novamente.";
     };
 };
 /*

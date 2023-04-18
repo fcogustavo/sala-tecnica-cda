@@ -50,16 +50,18 @@ router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res
             objDataPDF.gauges[c]["observacao"] = req.body[obs];
         };
         if (Array.isArray(req.body.exc)) {
+            let i = 1
             for (let exc of req.body.exc) {
-                objDataPDF.gauges.splice(Number(exc) - 1, 1)
+                objDataPDF.gauges.splice(Number(exc) - i, 1);
+                i++;
             };
-        } else {
+        } else if (req.body.exc) {
             objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
         };
         const doc = exportDataSheets(objDataPDF);
         console.log(objDataPDF)
         console.log(doc.title)
-        console.log(req.body)
+        console.log(req.body.exc)
         res.redirect('/');
     })();
 })

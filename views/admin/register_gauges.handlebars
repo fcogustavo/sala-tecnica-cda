@@ -14,7 +14,7 @@
     <form action="/admin/export_gauges" method="post">
         <table class="table">
             <thead class="table-primary">
-                <tr>
+                <tr align="center">
                     <th scope="col">#</th>
                     <th scope="col">Romaneio</th>
                     <th scope="col">Aço</th>
@@ -22,11 +22,12 @@
                     <th scope="col">Peso</th>
                     <th scope="col">Planilhador</th>
                     <th scope="col">Observação</th>
+                    <th scope="col">Excluir</th>
                 </tr>
             </thead>
             <tbody>
                 {{#each objDataPDF.gauges}}
-                    <tr>
+                    <tr align="center">
                         <th scope="row">{{id}}</th>
                         <td>{{romaneio}}</td>
                         <td>{{aco}}</td>
@@ -40,13 +41,16 @@
                             </select>
                         </td>
                         <td><input type="text" name="obs-{{id}}" class="form-control" placeholder="Insira Observação (opcional)" aria-describedby="basic-addon1"></td>
+                        <td>
+                            <input class="form-check-input" type="checkbox" value="{{id}}" name="exc" id="flexCheckDefault">
+                        </td>
                     </tr>
                 {{/each}}
                     <tr>
                         <td colspan="7" class="table-active" align="center"><strong>Resumo</strong></td>
                     </tr>
                 {{#each objDataPDF.summary}}
-                    <tr>
+                    <tr align="center">
                         <th scope="row">{{id}}</th>
                         <td>{{romaneio}}</td>
                         <td>{{aco}}</td>
@@ -54,10 +58,11 @@
                         <td>{{peso}}</td>
                         <td></td>
                         <td><input type="text" name="obs" class="form-control" aria-describedby="basic-addon1" disabled></td>
+                        <td><input class="form-check-input" type="checkbox" id="flexCheckDefault" disabled></td>
                     </tr>
                 {{/each}}
-                <tr>
-                    <td colspan="4" class="table-active" align="center"><strong>Peso Total - Kg</strong></td>
+                <tr align="center">
+                    <td colspan="4" class="table-active"><strong>Peso Total - Kg</strong></td>
                     <td colspan="1" class="table-active"><strong>{{objDataPDF.totalWeight}}</strong></td>
                 </tr>
             </tbody>

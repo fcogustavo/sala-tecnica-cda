@@ -40,7 +40,8 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
     };
 });
 
-router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => { 
+router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
+     
     (async () => {
         const objDataPDF = await pdfDataExtract(req.body.arquive)
         for (let c = 0; c < objDataPDF.gauges.length; c++) {
@@ -48,9 +49,17 @@ router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res
             objDataPDF.gauges[c]["planilhador"] = req.body.name[c];
             objDataPDF.gauges[c]["observacao"] = req.body[obs];
         };
+        if (Array.isArray(req.body.exc)) {
+            for (let exc of req.body.exc) {
+                objDataPDF.gauges.splice(Number(exc) - 1, 1)
+            };
+        } else {
+            objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
+        };
         const doc = exportDataSheets(objDataPDF);
         console.log(objDataPDF)
         console.log(doc.title)
+        console.log(req.body)
         res.redirect('/');
     })();
 })

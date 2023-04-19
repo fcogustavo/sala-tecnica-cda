@@ -60,9 +60,9 @@ router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res
         } else if (req.body.exc) {
             objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
         };
-        let msgExp = exportDataSheets(objDataPDF);
+        exportDataSheets(objDataPDF);
         console.log(objDataPDF);
-        req.flash('success_msg', msgExp);
+        req.flash('success_msg', "Dados enviados com sucesso!");
         res.redirect('/');
     })();
 })

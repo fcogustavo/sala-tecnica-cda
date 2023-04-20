@@ -27,6 +27,7 @@ const pdfDataExtract = async (file) => {
 		let gauges = [];
 		let data_text = data_1.text; // an array of text pages
 		let lines = data_text[0].split('\n');
+		console.log(lines)
 		let i = 0;
 		let c = 0;
 		let id = 0;
@@ -43,8 +44,12 @@ const pdfDataExtract = async (file) => {
 			if (esp) {
 				esp = false;
 				let temp = line.split(' ');
-				let temp_2 = temp[0].split('.');
-				requestCode += temp_2[0] + temp_2[1];
+				codePackingList = temp[0].replace('.', '');
+				if (codePackingList.includes('-')) {
+					codePackingList = codePackingList.replace('-', '');
+				} else {
+					codePackingList += 'A';
+				};
 			};
 			if (line.includes('Localizador')) {
 				esp = true; 
@@ -102,10 +107,10 @@ const pdfDataExtract = async (file) => {
 		return "Ocorreu um erro. Verifique o formato do arquivo.";
 	};
 };
-/*
+
 (async () => {
 	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/CSC.005-A ao D.pdf')
 	console.log(test)
 })()
-*/
+
 module.exports = pdfDataExtract;

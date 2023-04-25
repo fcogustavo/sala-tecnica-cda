@@ -27,12 +27,11 @@ const pdfDataExtract = async (file) => {
 		let gauges = [];
 		let data_text = data_1.text; // an array of text pages
 		let lines = data_text[0].split('\n');
-		console.log(lines)
-		let i = 0;
 		let c = 0;
 		let id = 0;
 		let esp = false;
-		let requestCode = ""
+		let i = true;
+		let requestCode;
 		let codePackingList;
 		let listGauges = [];
 		let listSteel = [];
@@ -44,13 +43,16 @@ const pdfDataExtract = async (file) => {
 			if (esp) {
 				esp = false;
 				let temp = line.split(' ');
-				codePackingList = temp[0].replace('.', '');
-				if (codePackingList.includes('-')) {
-					codePackingList = codePackingList.replace('-', '');
+				if (temp[0].includes('-')) {
+					c = temp[0].indexOf('-');
+					requestCode = temp[0].slice(0, c);
+					codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
 				} else {
-					codePackingList += 'A';
+					requestCode = temp[0];
+					codePackingList = requestCode.replace('.', '') + 'A';
 				};
 			};
+			
 			if (line.includes('Localizador')) {
 				esp = true; 
 			};
@@ -58,10 +60,6 @@ const pdfDataExtract = async (file) => {
 				break;
 			};
 			if (line.includes('CA50') || line.includes('CA60')) {
-				if (c == 0) {
-					i++;
-					codePackingList = requestCode + alphabet[i - 1]
-				};
 				id++;
 				let temp = line.split(' ');
 				if (!listGauges.includes(temp[0])) {
@@ -75,9 +73,11 @@ const pdfDataExtract = async (file) => {
 					"bitola": temp[0],
 					"peso": Math.round(Number(temp[2].replace(',', '.')))
 				});
-				c++;
 			} else {
-				c = 0;
+				let temp = line.split(' ');
+				if (temp[0].includes(requestCode) && temp[0][temp[0].length - 1] != 'A') {	
+					codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];		
+				};
 			};
 		};
 		// Extraindo dados do resumo dos romaneios

@@ -75,7 +75,7 @@ const pdfDataExtract = async (file) => {
 				});
 			} else {
 				let temp = line.split(' ');
-				if (temp[0].includes(requestCode) && temp[0][temp[0].length - 1] != 'A') {	
+				if (temp[0].includes(requestCode) && temp[0] != requestCode) {
 					codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];		
 				};
 			};

@@ -4,7 +4,6 @@ const { constrainedMemory } = require('process');
 
 const pdfDataExtract = async (file) => {
 
-	let alphabet = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"];
 	const file_data = fs.readFileSync(file);
 
 	// Busca o data aguardando.
@@ -27,10 +26,8 @@ const pdfDataExtract = async (file) => {
 		let gauges = [];
 		let data_text = data_1.text; // an array of text pages
 		let lines = data_text[0].split('\n');
-		let c = 0;
 		let id = 0;
 		let esp = false;
-		let i = true;
 		let requestCode;
 		let codePackingList;
 		let listGauges = [];
@@ -44,15 +41,12 @@ const pdfDataExtract = async (file) => {
 				esp = false;
 				let temp = line.split(' ');
 				if (temp[0].includes('-')) {
-					c = temp[0].indexOf('-');
-					requestCode = temp[0].slice(0, c);
-					codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
+					let i = temp[0].indexOf('-');
+					requestCode = temp[0].slice(0, i);
 				} else {
 					requestCode = temp[0];
-					codePackingList = requestCode.replace('.', '') + 'A';
 				};
 			};
-			
 			if (line.includes('Localizador')) {
 				esp = true; 
 			};
@@ -74,9 +68,13 @@ const pdfDataExtract = async (file) => {
 					"peso": Math.round(Number(temp[2].replace(',', '.')))
 				});
 			} else {
-				let temp = line.split(' ');
-				if (temp[0].includes(requestCode) && temp[0] != requestCode) {
-					codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];		
+				if (line.includes(requestCode)) {
+					let temp = line.split(' ');
+					if (temp[0].includes('-')) {
+						codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
+					} else {
+						codePackingList = requestCode.replace('.', '') + 'A';
+					};	
 				};
 			};
 		};
@@ -107,10 +105,10 @@ const pdfDataExtract = async (file) => {
 		return "Ocorreu um erro. Verifique o formato do arquivo.";
 	};
 };
-
+/*
 (async () => {
 	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/CSC.005-A ao D.pdf')
 	console.log(test)
 })()
-
+*/
 module.exports = pdfDataExtract;

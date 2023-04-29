@@ -61,7 +61,7 @@ router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res
         } else if (req.body.exc) {
             objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
         };
-        let idSheet =  req.body.sheet === "0" ? idSheetsGauges.cda : idSheetsGauges.test
+        let idSheet =  req.body.sheet === "0" ? idSheetsGauges.cda : idSheetsGauges.test;
         exportDataSheets(objDataPDF, idSheet);
         console.log(objDataPDF);
         req.flash('success_msg', "Dados enviados com sucesso!");

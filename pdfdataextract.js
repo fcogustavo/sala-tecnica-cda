@@ -1,6 +1,5 @@
 const fs = require('fs');
 const PDFDataExtract = require('pdfdataextract');
-const { constrainedMemory } = require('process');
 
 const pdfDataExtract = async (file) => {
 
@@ -9,7 +8,7 @@ const pdfDataExtract = async (file) => {
 	// Busca o data aguardando.
 	try {
 		const data_1 = await PDFDataExtract.PdfData.extract(file_data, {
-			pages: 10,
+			pages: 15,
 			sort: true,
 			verbosity: PDFDataExtract.VerbosityLevel.ERRORS,
 			get: {
@@ -22,19 +21,27 @@ const pdfDataExtract = async (file) => {
 				permissions: true, // get permissions
 			}
 		});
+
 		// Formata o objeto gauges a partir do data.
+
 		let gauges = [];
-		let data_text = data_1.text; // an array of text pages
-		let lines = data_text[0].split('\n');
+		let data_text = ''
+		data_1.text.forEach(txt => {
+			txt += '\n';
+			data_text += txt;
+		});
+		let lines = data_text.split('\n');
 		let id = 0;
 		let esp = false;
 		let requestCode;
 		let codePackingList;
 		let listGauges = [];
 		let listSteel = [];
+
 		if (lines[0] != "Carteira de Pedidos por Cliente/Obra") {
 			return "Documento não compatível!";
 		}
+
 		// Extraindo dados dos romaneios.
 		for (let line of lines) {
 			if (esp) {
@@ -78,14 +85,30 @@ const pdfDataExtract = async (file) => {
 				};
 			};
 		};
+
 		// Extraindo dados do resumo dos romaneios
 		let totalWeight = 0;
 		let summary = [];
 		for (let c = 0; c < listGauges.length; c++) {
+			listGauges[c] = {
+				bitola: listGauges[c],
+				aco: listSteel[c]
+			};
+		};
+		listGauges.sort((a, b) => {
+			if (Number(a.bitola.replace(',', '.')) < Number(b.bitola.replace(',', '.'))) {
+				return -1;
+			};
+			if (Number(a.bitola.replace(',', '.')) > Number(b.bitola.replace(',', '.'))) {
+				return 1;
+			};
+			return 0;
+		});
+		listGauges.forEach(element => {;
 			id++;
 			let weight = 0;
 			gauges.forEach(g => {
-				if (g.bitola == listGauges[c]) {
+				if (g.bitola == element.bitola) {
 					weight += g.peso;
 				}
 			});
@@ -93,11 +116,11 @@ const pdfDataExtract = async (file) => {
 			summary.push({
 				"id": id,
 				"romaneio": "Resumo",
-				"aco": listSteel[c],
-				"bitola": listGauges[c],
+				"aco": element.aco,
+				"bitola": element.bitola,
 				"peso": weight			
 			});
-		};
+		});
 
 		return {gauges, summary, totalWeight};
 	} catch (err) {

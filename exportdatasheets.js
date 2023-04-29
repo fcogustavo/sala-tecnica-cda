@@ -1,12 +1,9 @@
 const {GoogleSpreadsheet} = require('google-spreadsheet');
-const credentials = require('./config/credentials.json')
+const credentials = require('./config/credentials.json');
 
-const idSheetCDA = '11Kk2nFmJSqrfKD_uB5aiGbZ9hCA0K6Ss_sKRP_zDlVk'
-const idSheetTest = '1hWAX934Wk2sE1xeja_Di4L5f2nsc5I-e7XfXTnnloyc'
-
-const exportData = async (obj=undefined) => {
+const exportData = async (obj=undefined, id="") => {
     try {
-        const doc = new GoogleSpreadsheet(idSheetCDA);
+        const doc = new GoogleSpreadsheet(id);
     
         await doc.useServiceAccountAuth({
             client_email: credentials.client_email,
@@ -34,12 +31,11 @@ const exportData = async (obj=undefined) => {
                     "Peso total deste romaneio:": line.peso,
                     "Informe neste campo alguma observação:": line.observacao
                 });
-            };  
-        };
-        
-        return "Documento salvo com sucesso!";
+            };
+            return "Dados enviados com sucesso!";
+        };    
     } catch (err) {
-        console.log(`Ocorreu um erro durante o processo: ${err.message}`);
+        console.log(`Houve um erro durante o processo: ${err.message}`);
         return "Houve um erro durante o processo! Tente novamente.";
     };
 };

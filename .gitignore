@@ -1,5 +1,6 @@
 arquives_test/
 config/db.js
 config/credentials.json
+config/datavar.json
 node_modules/
 public/data/

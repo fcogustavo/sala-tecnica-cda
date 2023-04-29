@@ -4,6 +4,7 @@ const {eAdmin} = require('../helpers/eAdmin');
 const User = require('../models/User');
 const pdfDataExtract = require('../pdfdataextract');
 const exportDataSheets = require('../exportdatasheets');
+const {idSheetsGauges} = require('../config/datavar.json');
 const multer = require('multer');
 const upload = multer({dest: './public/data/uploads'});
 
@@ -60,7 +61,8 @@ router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res
         } else if (req.body.exc) {
             objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
         };
-        exportDataSheets(objDataPDF);
+        let idSheet =  req.body.sheet === "0" ? idSheetsGauges.cda : idSheetsGauges.test
+        exportDataSheets(objDataPDF, idSheet);
         console.log(objDataPDF);
         req.flash('success_msg', "Dados enviados com sucesso!");
         res.redirect('/');

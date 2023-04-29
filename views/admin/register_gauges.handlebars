@@ -1,4 +1,4 @@
-<div class="card mt-4">
+<div class="card mt-5">
     <div class="card-body">
         <h3>Cadastro de bitolas</h3>
         <p>Insira abaixo o arquivo resumo de aço:</p>
@@ -12,6 +12,13 @@
 </div>
 {{#if objDataPDF}}
     <form action="/admin/export_gauges" method="post">
+        <div class="mt-3">
+            <label for="sheet" class="form-label">Planilha de destino:</label>
+            <select class="form-select form-select-lg mb-3" name="sheet" id="sheet">
+                    <option value="0" selected>Planilhamento</option>
+                    <option value="1">Teste</option>
+            </select>
+        </div>
         <table class="table">
             <thead class="table-primary">
                 <tr align="center">

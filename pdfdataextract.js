@@ -8,7 +8,7 @@ const pdfDataExtract = async (file) => {
 	// Busca o data aguardando.
 	try {
 		const data_1 = await PDFDataExtract.PdfData.extract(file_data, {
-			pages: 15,
+			pages: 100,
 			sort: true,
 			verbosity: PDFDataExtract.VerbosityLevel.ERRORS,
 			get: {
@@ -33,6 +33,7 @@ const pdfDataExtract = async (file) => {
 		let lines = data_text.split('\n');
 		let id = 0;
 		let esp = false;
+		let open = false;
 		let requestCode;
 		let codePackingList;
 		let listGauges = [];
@@ -55,33 +56,36 @@ const pdfDataExtract = async (file) => {
 				};
 			};
 			if (line.includes('Localizador')) {
-				esp = true; 
+				esp = true;
+				open = true; 
 			};
 			if (line.includes('Resumo Pedido')) {
-				break;
+				open = false;
 			};
-			if (line.includes('CA50') || line.includes('CA60')) {
-				id++;
-				let temp = line.split(' ');
-				if (!listGauges.includes(temp[0])) {
-					listGauges.push(temp[0]);
-					listSteel.push(temp[1]);
-				};
-				gauges.push({
-					"id": id,
-					"romaneio": codePackingList,
-					"aco": temp[1],
-					"bitola": temp[0],
-					"peso": Math.round(Number(temp[2].replace(',', '.')))
-				});
-			} else {
-				if (line.includes(requestCode)) {
+			if (open) {
+				if (line.includes('CA50') || line.includes('CA60')) {
+					id++;
 					let temp = line.split(' ');
-					if (temp[0].includes('-')) {
-						codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
-					} else {
-						codePackingList = requestCode.replace('.', '') + 'A';
-					};	
+					if (!listGauges.includes(temp[0])) {
+						listGauges.push(temp[0]);
+						listSteel.push(temp[1]);
+					};
+					gauges.push({
+						"id": id,
+						"romaneio": codePackingList,
+						"aco": temp[1],
+						"bitola": temp[0],
+						"peso": Math.round(Number(temp[2].replace(',', '.')))
+					});
+				} else {
+					if (line.includes(requestCode)) {
+						let temp = line.split(' ');
+						if (temp[0].includes('-')) {
+							codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
+						} else {
+							codePackingList = requestCode.replace('.', '') + 'A';
+						};	
+					};
 				};
 			};
 		};
@@ -130,7 +134,7 @@ const pdfDataExtract = async (file) => {
 };
 /*
 (async () => {
-	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/CSC.005-A ao D.pdf')
+	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/BSF.001 a 045.pdf')
 	console.log(test)
 })()
 */

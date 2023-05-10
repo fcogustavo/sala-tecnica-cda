@@ -41,8 +41,8 @@ const exportData = async (obj=undefined, id="") => {
 };
 /*
 (async () => { 
+    const obj = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/BSF.001 a 045.pdf')
     const test = await exportData();
-    console.log(test.title)
 })()
 */
 module.exports = exportData;

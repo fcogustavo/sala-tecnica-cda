@@ -32,11 +32,17 @@ const exportData = async (obj=undefined, id="") => {
                     "Informe neste campo alguma observação:": line.observacao
                 });
             };
-            return "Dados enviados com sucesso!";
+            return {
+                statusProcess: "success",
+                msg: "Dados enviados com sucesso!"
+            };
         };    
     } catch (err) {
         console.log(`Houve um erro durante o processo: ${err.message}`);
-        return "Houve um erro durante o processo! Tente novamente.";
+        return {
+            statusProcess: "error",
+            msg: "Houve um erro durante o processo! Tente novamente."
+        };
     };
 };
 /*

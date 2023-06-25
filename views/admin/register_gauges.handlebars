@@ -15,8 +15,9 @@
         <div class="mt-3">
             <label for="sheet" class="form-label">Planilha de destino:</label>
             <select class="form-select form-select-lg mb-3" name="sheet" id="sheet">
-                    <option value="0" selected>Planilhamento</option>
-                    <option value="1">Teste</option>
+                {{#each sheets}}
+                    <option value="{{sheet}}" {{select}}>{{sheet}}</option>
+                {{/each}}
             </select>
         </div>
         <table class="table">

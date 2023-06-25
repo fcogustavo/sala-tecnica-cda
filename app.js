@@ -42,7 +42,7 @@ require('./config/auth')(passport);
         app.engine('handlebars', handlebars.engine({defaultLayout: 'main'}));
         app.set('view engine', 'handlebars');
     // Mongoose
-        mongoose.connect(db.mongoURI).then(() => {
+        mongoose.connect(db.mongoURI, {dbName: 'cda-st'}).then(() => {
             console.log('MongoDB conectado!');
         }).catch((err) => {
             console.log('Erro ao conectar-se ao mongoDB', err);

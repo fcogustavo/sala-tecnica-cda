@@ -4,7 +4,7 @@ const {eAdmin} = require('../helpers/eAdmin');
 const User = require('../models/User');
 const pdfDataExtract = require('../pdf-data-extract');
 const exportDataSheets = require('../export-data-sheets');
-const {idSheetsGauges} = require('../config/datavar.json');
+const {sheetsGauges} = require('../config/datavar.json');
 const multer = require('multer');
 const upload = multer({dest: './public/data/uploads'});
 
@@ -17,56 +17,84 @@ router.get('/register_gauges', eAdmin, (req, res) => {
 });
 
 router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
-    let arquive = req.file;
-    let user = req.user;
-    if (arquive) {  
-        (async () => {
-            let objDataPDF = await pdfDataExtract(arquive.path);
-            console.log(objDataPDF)
-            if (typeof objDataPDF == "string") {
-                req.flash('error_msg', objDataPDF);
-                res.redirect('/admin/register_gauges');
-            } else {
-                let users = await User.find().lean();
-                users.forEach(u => {
-                    if (u.email == user.email) {
-                        u["select"] = "selected";
-                    } else {
-                        u["select"] = "";
+    try {
+        let arquive = req.file;
+        if (arquive) {  
+            (async () => {
+                let objDataPDF = await pdfDataExtract(arquive.path);
+                if (typeof objDataPDF == "string") {
+                    req.flash('error_msg', objDataPDF);
+                    res.redirect('/admin/register_gauges');
+                } else {
+                    console.log(objDataPDF);
+                    let user = req.user;
+                    let sheets = [];
+                    for (let nameSheet in sheetsGauges) {
+                        sheets.push({
+                            sheet: nameSheet,
+                            select: sheetsGauges[nameSheet]["status"] == "default" ? "selected" : ""
+                        });
                     };
-                });
-                arquive = arquive.path
-                res.render('admin/register_gauges', {objDataPDF, users, arquive});
-            };  
-        })();
-    } else {
+                    let users = await User.find().lean();
+                    users.forEach(u => {
+                        if (u.email == user.email) {
+                            u["select"] = "selected";
+                        } else {
+                            u["select"] = "";
+                        };
+                    });
+                    arquive = arquive.path;
+                    res.render('admin/register_gauges', {objDataPDF, users, sheets, arquive});
+                };  
+            })();
+        } else {
+            res.redirect('/admin/register_gauges');
+        };
+    } catch (err) {
+        console.log(`Houve um erro durante o processo: ${err.message}`)
+        req.flash('error_msg', 'Houve um erro durante o processo. Tente novamente.');
         res.redirect('/admin/register_gauges');
     };
 });
 
 router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
-    (async () => {
-        const objDataPDF = await pdfDataExtract(req.body.arquive)
-        for (let c = 0; c < objDataPDF.gauges.length; c++) {
-            let obs = "obs-" + objDataPDF.gauges[c].id;
-            objDataPDF.gauges[c]["planilhador"] = req.body.name[c];
-            objDataPDF.gauges[c]["observacao"] = req.body[obs];
-        };
-        if (Array.isArray(req.body.exc)) {
-            let i = 1
-            for (let exc of req.body.exc) {
-                objDataPDF.gauges.splice(Number(exc) - i, 1);
-                i++;
-            };
-        } else if (req.body.exc) {
-            objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
-        };
-        let idSheet =  req.body.sheet === "0" ? idSheetsGauges.cda : idSheetsGauges.test;
-        exportDataSheets(objDataPDF, idSheet);
-        console.log(objDataPDF);
-        req.flash('success_msg', "Dados enviados com sucesso!");
+    try {
+        (async () => {
+            let objDataPDF = await pdfDataExtract(req.body.arquive);
+            if (typeof objDataPDF == "string") {
+                req.flash('error_msg', "Houve um erro durante o processo. Tente novamente.");
+                res.redirect('/admin/register_gauges');
+            } else {
+                for (let c = 0; c < objDataPDF.gauges.length; c++) {
+                    let obs = "obs-" + objDataPDF.gauges[c].id;
+                    objDataPDF.gauges[c]["planilhador"] = req.body.name[c];
+                    objDataPDF.gauges[c]["observacao"] = req.body[obs];
+                };
+                if (Array.isArray(req.body.exc)) {
+                    let i = 1
+                    for (let exc of req.body.exc) {
+                        objDataPDF.gauges.splice(Number(exc) - i, 1);
+                        i++;
+                    };
+                } else if (req.body.exc) {
+                    objDataPDF.gauges.splice(Number(req.body.exc) - 1, 1);    
+                };
+                let idSheet =  sheetsGauges[req.body.sheet]["id"];
+                let process = await exportDataSheets(objDataPDF, idSheet);
+                if (process.statusProcess == "success") {
+                    req.flash('success_msg', process.msg);
+                    console.log(objDataPDF); 
+                } else {
+                    req.flash('error_msg', process.msg)
+                };
+                res.redirect('/');   
+            };  
+        })();
+    } catch (err) {
+        console.log(`Houve um erro durante o processo: ${err.message}`)
+        req.flash('error_msg', 'Houve um erro durante o processo.');
         res.redirect('/');
-    })();
-})
+    };
+});
 
 module.exports = router;

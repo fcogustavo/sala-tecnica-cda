@@ -12,11 +12,11 @@ router.get('/', eAdmin, (req, res) => {
     res.render('admin/index');
 });
 
-router.get('/register_gauges', eAdmin, (req, res) => {
-    res.render('admin/register_gauges');
+router.get('/register-gauges', eAdmin, (req, res) => {
+    res.render('admin/register-gauges');
 });
 
-router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
+router.post('/get-gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
     try {
         let arquive = req.file;
         if (arquive) {  
@@ -24,7 +24,7 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
                 let objDataPDF = await pdfDataExtract(arquive.path);
                 if (typeof objDataPDF == "string") {
                     req.flash('error_msg', objDataPDF);
-                    res.redirect('/admin/register_gauges');
+                    res.redirect('/admin/register-gauges');
                 } else {
                     console.log(objDataPDF);
                     let user = req.user;
@@ -44,26 +44,26 @@ router.post('/get_gauges', eAdmin, upload.single('registerGauges'), (req, res) =
                         };
                     });
                     arquive = arquive.path;
-                    res.render('admin/register_gauges', {objDataPDF, users, sheets, arquive});
+                    res.render('admin/register-gauges', {objDataPDF, users, sheets, arquive});
                 };  
             })();
         } else {
-            res.redirect('/admin/register_gauges');
+            res.redirect('/admin/register-gauges');
         };
     } catch (err) {
         console.log(`Houve um erro durante o processo: ${err.message}`)
         req.flash('error_msg', 'Houve um erro durante o processo. Tente novamente.');
-        res.redirect('/admin/register_gauges');
+        res.redirect('/admin/register-gauges');
     };
 });
 
-router.post('/export_gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
+router.post('/export-gauges', eAdmin, upload.single('registerGauges'), (req, res) => {
     try {
         (async () => {
             let objDataPDF = await pdfDataExtract(req.body.arquive);
             if (typeof objDataPDF == "string") {
                 req.flash('error_msg', "Houve um erro durante o processo. Tente novamente.");
-                res.redirect('/admin/register_gauges');
+                res.redirect('/admin/register-gauges');
             } else {
                 for (let c = 0; c < objDataPDF.gauges.length; c++) {
                     let obs = "obs-" + objDataPDF.gauges[c].id;

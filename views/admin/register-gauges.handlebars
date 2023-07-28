@@ -2,7 +2,7 @@
     <div class="card-body">
         <h3>Cadastro de bitolas</h3>
         <p>Insira abaixo o arquivo resumo de aço:</p>
-        <form action="/admin/get_gauges" enctype="multipart/form-data" method="post">
+        <form action="/admin/get-gauges" enctype="multipart/form-data" method="post">
             <input type="file" class="form-control" name="registerGauges">
             <br>
             <button type="submit" class="btn btn-primary">Analisar</button>
@@ -11,7 +11,7 @@
     </div>
 </div>
 {{#if objDataPDF}}
-    <form action="/admin/export_gauges" method="post">
+    <form action="/admin/export-gauges" method="post">
         <div class="mt-3">
             <label for="sheet" class="form-label">Planilha de destino:</label>
             <select class="form-select form-select-lg mb-3" name="sheet" id="sheet">
@@ -78,6 +78,6 @@
         <input type="text" name="arquive" value="{{arquive}}" hidden>
         <hr>
         <button type="submit" class="btn btn-primary btn-lg">Enviar</button>
-        <a href="/admin/register_gauges"><button type="button" class="btn btn-secondary btn-lg">Cancelar</button></a>
+        <a href="/admin/register-gauges"><button type="button" class="btn btn-secondary btn-lg">Cancelar</button></a>
     </form>
 {{/if}}

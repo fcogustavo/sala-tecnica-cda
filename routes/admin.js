@@ -97,4 +97,8 @@ router.post('/export-gauges', eAdmin, upload.single('registerGauges'), (req, res
     };
 });
 
+router.get('/helix-continues', eAdmin, (req, res) => {
+    res.render('admin/helix-continues')
+});
+
 module.exports = router;

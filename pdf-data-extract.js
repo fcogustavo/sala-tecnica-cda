@@ -63,12 +63,33 @@ const pdfDataExtract = async (file) => {
 				open = false;
 			};
 			if (open) {
-				if (line.includes('CA50') || line.includes('CA60')) {
+				if (line.includes('CA50') || line.includes('CA60') || line.includes('CA25')) {
 					id++;
 					let temp = line.split(' ');
 					if (!listGauges.includes(temp[0])) {
 						listGauges.push(temp[0]);
 						listSteel.push(temp[1]);
+					} else {
+						let n = 0;
+						for (let c of listGauges) {
+							if (c == temp[0]) {
+								n++;
+							};
+						};
+						let i = listGauges.indexOf(temp[0]);
+						if (n == 1) {
+							if (listSteel[i] != temp[1]) {
+								listGauges.push(temp[0]);
+								listSteel.push(temp[1]);	
+							};
+						
+						} else if (n == 2) {
+							let i_2 = listGauges.lastIndexOf(temp[0]);
+							if (listSteel[i] != temp[1] && listSteel[i_2] != temp[1]) {
+								listGauges.push(temp[0]);
+								listSteel.push(temp[1]);	
+							};
+						};
 					};
 					gauges.push({
 						"id": id,
@@ -134,7 +155,7 @@ const pdfDataExtract = async (file) => {
 };
 /*
 (async () => {
-	const test = await pdfDataExtract('arquives_test/PDFs/resumo_de_aco/BSF.001 a 045.pdf')
+	const test = await pdfDataExtract('360.025-A ao U.pdf')
 	console.log(test)
 })()
 */

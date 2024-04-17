@@ -1,5 +1,10 @@
 const fs = require('fs');
 const PDFDataExtract = require('pdfdataextract');
+const xl = require('excel4node');
+
+const wb = new xl.Workbook();
+
+var ws = wb.addWorksheet('Database');
 
 const pdfDataExtract = async (file) => {
 
@@ -36,10 +41,10 @@ const pdfDataExtract = async (file) => {
 			let l_item = item.split(' ');
 			if(Number(l_item[0])) {
 				if (i == 0) {
-					os.os = Number(l_item[0]);
+					os["os"] = l_item[0];
 					i++;
 				} else {
-					os.trechos = l_item;
+					os["trechos"] = l_item.join(', ');
 				};
 			} else if (l_item[0].includes('.')) {
 				let l_temp = l_item[3].split(',')
@@ -51,22 +56,25 @@ const pdfDataExtract = async (file) => {
 				let n2 = Number(t2.slice(t, t2.length));
 				let n3 = Number(t2.slice(0, t));
 				if (n2 <= n1) {
-					l_temp.splice(0, 2, n3, n2, n1);
+					l_temp.splice(0, 2, String(n3), String(n2), String(n1));
 				} else {
 					n2 = Number(t2.slice(t + 1, t2.length));
 					n3 = Number(t2.slice(0, t + 1));			
-					l_temp.splice(0, 2, n3, n2, n1);
+					l_temp.splice(0, 2, String(n3), String(n2), String(n1));
 				}
 				l_temp.pop();
-				let l_temp2 = l_item.slice(0,3).concat(l_temp, l_item.slice(4, l_item.length));
-				os.localizador = l_temp2[0];
-				os.bitola = l_temp2[1];
-				os.formato = l_temp2[2];
-				os["nº de dobras"] = l_temp2[3];
-				os["comprimento real"] = l_temp2[4];
-				os["comprimento nominal"] = l_temp2[5];
-				os.peso = l_temp2[6];
-				os.quantidade = Number(l_temp2[7]);
+				l_temp.unshift(l_item[0], l_item[1], l_item[2]);
+				for (let c = 4; c < l_item.length; c++) {
+					l_temp.push(l_item[c]);
+				};
+				os["localizador"] = l_temp[0];
+				os["bitola"] = l_temp[1];
+				os["formato"] = l_temp[2];
+				os["dobras"] = l_temp[3];
+				os["comprimentoReal"] = l_temp[4];
+				os["comprimentoNominal"] = l_temp[5];
+				os["peso"] = l_temp[6];
+				os["quantidade"] = l_temp[7];
 				listOS.push(os);
 				os = {};
 				i = 0;
@@ -81,8 +89,25 @@ const pdfDataExtract = async (file) => {
 };
 
 (async () => {
-	const test = await pdfDataExtract('arquives_test/Teste corte médio.pdf')
-	console.log(test)
-})()
+	const listOS = await pdfDataExtract('arquives_test/Teste corte médio.pdf');
+
+	let headingColumnNames = Object.keys(listOS[0]);
+	console.log(headingColumnNames)
+	
+	let headingColumnIndex = 1;
+	
+	headingColumnNames.forEach(heading => {
+		ws.cell(1, headingColumnIndex++).string(heading);
+	});
+	let rawIndex = 2;
+	listOS.forEach(os => {
+		let columnIndex = 1;
+		headingColumnNames.forEach(columnName => {
+			ws.cell(rawIndex, columnIndex++).string(os[columnName]);
+		});
+		rawIndex++
+	});
+	wb.write('planilhaTest3.xlsx');
+})();
 
 module.exports = pdfDataExtract;

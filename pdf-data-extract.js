@@ -1,10 +1,5 @@
 const fs = require('fs');
 const PDFDataExtract = require('pdfdataextract');
-const xl = require('excel4node');
-
-const wb = new xl.Workbook();
-
-var ws = wb.addWorksheet('Database');
 
 const pdfDataExtract = async (file) => {
 
@@ -27,90 +22,141 @@ const pdfDataExtract = async (file) => {
 			}
 		});
 
-		// Formata a partir do data.
+		// Formata o objeto gauges a partir do data.
+
+		let gauges = [];
 		let data_text = ''
 		data_1.text.forEach(txt => {
 			txt += '\n';
 			data_text += txt;
 		});
 		let lines = data_text.split('\n');
-		console.log(lines);
-		let i = 0;
-		let os = {};
-		let listOS = [];
-		lines.forEach(item => {
-			let l_item = item.split(' ');
-			if(Number(l_item[0])) {
-				if (i == 0) {
-					os["os"] = l_item[0];
-					i++;
+		let id = 0;
+		let esp = false;
+		let open = false;
+		let requestCode;
+		let codePackingList;
+		let listGauges = [];
+		let listSteel = [];
+
+		if (lines[0] != "Carteira de Pedidos por Cliente/Obra") {
+			return "Documento não compatível!";
+		}
+
+		// Extraindo dados dos romaneios.
+		for (let line of lines) {
+			if (esp) {
+				esp = false;
+				let temp = line.split(' ');
+				if (temp[0].includes('-')) {
+					let i = temp[0].indexOf('-');
+					requestCode = temp[0].slice(0, i);
 				} else {
-					os["trechos"] = l_item.join(', ');
+					requestCode = temp[0];
 				};
-			} else if (l_item[0].includes('.')) {
-				let l_temp = l_item[3].split(',')
-				let t1 = l_temp[1].replaceAll('.','')
-				let t2 = l_temp[0].replaceAll('.','')
-				let len = String(Number(t1)).length
-				let t = t2.length - len;
-				let n1 = Number(t1);
-				let n2 = Number(t2.slice(t, t2.length));
-				let n3 = Number(t2.slice(0, t));
-				if (n2 <= n1) {
-					l_temp.splice(0, 2, String(n3), String(n2), String(n1));
+			};
+			if (line.includes('Localizador')) {
+				esp = true;
+				open = true; 
+			};
+			if (line.includes('Resumo Pedido')) {
+				open = false;
+			};
+			if (open) {
+				if (line.includes('CA50') || line.includes('CA60') || line.includes('CA25')) {
+					id++;
+					let temp = line.split(' ');
+					if (!listGauges.includes(temp[0])) {
+						listGauges.push(temp[0]);
+						listSteel.push(temp[1]);
+					} else {
+						let n = 0;
+						for (let c of listGauges) {
+							if (c == temp[0]) {
+								n++;
+							};
+						};
+						let i = listGauges.indexOf(temp[0]);
+						if (n == 1) {
+							if (listSteel[i] != temp[1]) {
+								listGauges.push(temp[0]);
+								listSteel.push(temp[1]);	
+							};
+						
+						} else if (n == 2) {
+							let i_2 = listGauges.lastIndexOf(temp[0]);
+							if (listSteel[i] != temp[1] && listSteel[i_2] != temp[1]) {
+								listGauges.push(temp[0]);
+								listSteel.push(temp[1]);	
+							};
+						};
+					};
+					gauges.push({
+						"id": id,
+						"romaneio": codePackingList,
+						"aco": temp[1],
+						"bitola": temp[0],
+						"peso": Math.round(Number(temp[2].replace(',', '.')))
+					});
 				} else {
-					n2 = Number(t2.slice(t + 1, t2.length));
-					n3 = Number(t2.slice(0, t + 1));			
-					l_temp.splice(0, 2, String(n3), String(n2), String(n1));
+					if (line.includes(requestCode)) {
+						let temp = line.split(' ');
+						if (temp[0].includes('-')) {
+							codePackingList = requestCode.replace('.', '') + temp[0][temp[0].length - 1];
+						} else {
+							codePackingList = requestCode.replace('.', '') + 'A';
+						};	
+					};
+				};
+			};
+		};
+
+		// Extraindo dados do resumo dos romaneios
+		let totalWeight = 0;
+		let summary = [];
+		for (let c = 0; c < listGauges.length; c++) {
+			listGauges[c] = {
+				bitola: listGauges[c],
+				aco: listSteel[c]
+			};
+		};
+		listGauges.sort((a, b) => {
+			if (Number(a.bitola.replace(',', '.')) < Number(b.bitola.replace(',', '.'))) {
+				return -1;
+			};
+			if (Number(a.bitola.replace(',', '.')) > Number(b.bitola.replace(',', '.'))) {
+				return 1;
+			};
+			return 0;
+		});
+		listGauges.forEach(element => {;
+			id++;
+			let weight = 0;
+			gauges.forEach(g => {
+				if (g.bitola == element.bitola) {
+					weight += g.peso;
 				}
-				l_temp.pop();
-				l_temp.unshift(l_item[0], l_item[1], l_item[2]);
-				for (let c = 4; c < l_item.length; c++) {
-					l_temp.push(l_item[c]);
-				};
-				os["localizador"] = l_temp[0];
-				os["bitola"] = l_temp[1];
-				os["formato"] = l_temp[2];
-				os["dobras"] = l_temp[3];
-				/*
-				os["comprimentoReal"] = l_temp[4];
-				os["comprimentoNominal"] = l_temp[5];
-				os["peso"] = l_temp[6];
-				os["quantidade"] = l_temp[7];
-				*/
-				listOS.push(os);
-				os = {};
-				i = 0;
-			}
+			});
+			totalWeight += weight;
+			summary.push({
+				"id": id,
+				"romaneio": "Resumo",
+				"aco": element.aco,
+				"bitola": element.bitola,
+				"peso": weight			
+			});
 		});
 
-		return listOS;
+		return {gauges, summary, totalWeight};
 	} catch (err) {
 		console.log(`Ocorreu um erro durante o processo: ${err.message}`);
 		return "Ocorreu um erro. Verifique o formato do arquivo.";
 	};
 };
-
+/*
 (async () => {
-	const listOS = await pdfDataExtract('arquives_test/Teste corte médio.pdf');
-
-	let headingColumnNames = Object.keys(listOS[0]);
-	console.log(headingColumnNames)
-	
-	let headingColumnIndex = 1;
-	
-	headingColumnNames.forEach(heading => {
-		ws.cell(1, headingColumnIndex++).string(heading);
-	});
-	let rawIndex = 2;
-	listOS.forEach(os => {
-		let columnIndex = 1;
-		headingColumnNames.forEach(columnName => {
-			ws.cell(rawIndex, columnIndex++).string(os[columnName]);
-		});
-		rawIndex++
-	});
-	wb.write('planilhaTest4.xlsx');
-})();
-
+	const test = await pdfDataExtract('360.025-A ao U.pdf')
+	console.log(test)
+})()
+*/
 module.exports = pdfDataExtract;

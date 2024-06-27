@@ -34,6 +34,7 @@ const pdfDataExtract = async (file) => {
 			data_text += txt;
 		});
 		let lines = data_text.split('\n');
+		console.log(lines);
 		let i = 0;
 		let os = {};
 		let listOS = [];
@@ -71,10 +72,12 @@ const pdfDataExtract = async (file) => {
 				os["bitola"] = l_temp[1];
 				os["formato"] = l_temp[2];
 				os["dobras"] = l_temp[3];
+				/*
 				os["comprimentoReal"] = l_temp[4];
 				os["comprimentoNominal"] = l_temp[5];
 				os["peso"] = l_temp[6];
 				os["quantidade"] = l_temp[7];
+				*/
 				listOS.push(os);
 				os = {};
 				i = 0;
@@ -107,7 +110,7 @@ const pdfDataExtract = async (file) => {
 		});
 		rawIndex++
 	});
-	wb.write('planilhaTest3.xlsx');
+	wb.write('planilhaTest4.xlsx');
 })();
 
 module.exports = pdfDataExtract;
